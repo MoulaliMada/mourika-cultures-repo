@@ -53,7 +53,7 @@ const customerLogin = async (req, res) => {
     );
     return res
       .status(200)
-      .json({ message: "login successfully", token, user: existingCustomer });
+      .json({ message: "login successfully", token, customer: existingCustomer });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
