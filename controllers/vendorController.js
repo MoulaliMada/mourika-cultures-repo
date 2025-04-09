@@ -30,13 +30,14 @@ const vendorRegister = async (req, res) => {
   }
 };
 
+// vendor login with phone number and password
 const vendorLogin = async (req, res) => {
   const { phoneNumber, password } = req.body;
   try {
     const existingVendor = await Vendor.findOne({ phoneNumber });
-    if (!existingVendor) {
+    if (!existingVendor) { //checking the user found or not
       return res.status(400).json({ message: "vendor not found" });
-    } else if (!(await bcrypt.compare(password, existingVendor.password))) {
+    } else if (!(await bcrypt.compare(password, existingVendor.password))) {  // checking existing password and user enter password correct or not
       return res.status(401).json({ message: "Invalid credentials" });
     }
     const token = jwt.sign(

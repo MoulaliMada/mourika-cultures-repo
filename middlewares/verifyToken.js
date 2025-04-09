@@ -8,7 +8,7 @@ dotenv.config();
 const secretKey = process.env.JWT_SECRET;
 
 const verifyCustomerToken = async (req, res, next) => {
-  const token = req.heades.token;
+  const token = req.headers.token;
   if (!token) {
     res.status(400).json({ message: "token is required" });
   }
@@ -27,13 +27,13 @@ const verifyCustomerToken = async (req, res, next) => {
 };
 
 const verifyVendorToken = async (req, res, next) => {
-  const token = req.heades.token;
+  const token = req.headers.token;
   if (!token) {
     res.status(400).json({ message: "token is required" });
   }
   try {
     const decoded = jwt.verify(token, secretKey);
-    const vendor = await Vendor.findById(decoded.customerId);
+    const vendor = await Vendor.findById(decoded.vendorId);
     if (!vendor) {
       res.status(400).json({ message: "vendor not found" });
     }
