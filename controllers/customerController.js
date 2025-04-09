@@ -5,7 +5,8 @@ const dotEnv = require("dotenv");
 
 dotEnv.config();
 const secreteKey = process.env.JWT_SECRET;
-
+ 
+// customer registration 
 const customerRegister = async (req, res) => {
   const { customerName, email, phoneNumber, password, isVendor } = req.body;
   try {
@@ -32,6 +33,7 @@ const customerRegister = async (req, res) => {
   }
 };
 
+// customer login and generation jwt token
 const customerLogin = async (req, res) => {
   const { phoneNumber, password } = req.body;
   try {
@@ -58,6 +60,7 @@ const customerLogin = async (req, res) => {
   }
 };
 
+// getting cistomer by id
 const getCustomerById = async (req, res) => {
   const customerId = req.params.customerid;
   try {

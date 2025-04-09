@@ -20,9 +20,29 @@ const customerSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  isVendor: {
-    type: Boolean,
-    default: false,
+  wishList: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
+  },
+  cartList: {
+    type: [
+      {
+        product: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+        },
+        quantity: {
+          type: Number,
+          min: 1,
+          default: 1,
+        },
+      },
+    ],
+    default: [],
   },
 });
 

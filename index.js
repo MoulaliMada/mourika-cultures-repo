@@ -1,4 +1,5 @@
 const customerRouter = require("./routes/customerRoute");
+const vendorRouter = require("./routes/vendorRoute");
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
@@ -15,6 +16,8 @@ mongoose
   .catch((error) => console.log(error));
 
 app.use("/customer", customerRouter);
+app.use("/vendor/", vendorRouter);
+
 app.get("/", (req, res) => {
   res.send("namaste");
 });

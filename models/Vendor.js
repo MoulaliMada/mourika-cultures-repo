@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const vendorSchema = new mongoose.Schema({
-  name: {
+  vendorName: {
     type: String,
     required: true,
   },
@@ -23,7 +23,7 @@ const vendorSchema = new mongoose.Schema({
   customers: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "Customer",
     },
   ],
 });
