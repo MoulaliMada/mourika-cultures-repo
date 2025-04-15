@@ -35,10 +35,18 @@ const vendorLogin = async (req, res) => {
   const { phoneNumber, password } = req.body;
   try {
     const existingVendor = await Vendor.findOne({ phoneNumber });
-    if (!existingVendor) { //checking the user found or not
+    if (!existingVendor) {
+      //checking the user found or not
       return res.status(400).json({ message: "vendor not found" });
-    } else if (!(await bcrypt.compare(password, existingVendor.password))) {  // checking existing password and user enter password correct or not
-      return res.status(401).json({ message: "Invalid credentials" });
+    } else if (!(await bcrypt.compare(password, existingVendor.password))) {
+      // checking existing password and user enter password correct or not
+      return res
+        .status(401)
+        .json({
+          message: "Invalid credentials",
+          password1: password,
+          password2: existingVendor.password,
+        });
     }
     const token = jwt.sign(
       {
@@ -48,7 +56,7 @@ const vendorLogin = async (req, res) => {
       secreteKey,
       { expiresIn: "1d" }
     );
-    
+
     return res
       .status(200)
       .json({ message: "login successfully", token, vendor: existingVendor });
