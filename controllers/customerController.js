@@ -95,12 +95,22 @@ const addProductInCartByCustomerId = async (req, res) => {
     if (!product) {
       return res.status(400).json({ message: "product not found" });
     }
-    // Add the product to the customer's cartList
-    const productobj = {
-      product: product._id,
-      quantity,
-    };
-    customer.cartList.push(productobj);
+
+    // Check if product already exists in cart
+    const existingCartItem = customer.cartList.find(
+      (item) => item.product.toString() === ProductId
+    );
+
+    if (existingCartItem) {
+      existingCartItem.quantity = quantity;
+    } else {
+      // Add the product to the customer's cartList
+      const productobj = {
+        product: product._id,
+        quantity,
+      };
+      customer.cartList.push(productobj);
+    }
 
     // Save the updated customer
     await customer.save();
@@ -111,7 +121,9 @@ const addProductInCartByCustomerId = async (req, res) => {
 
     const cartList = updatedCustomer.cartList;
     res.status(200).json({
-      message: "Product added to cart successfully",
+      message: existingCartItem
+        ? "Product quantity updated in cart"
+        : "Product added to cart successfully",
       cartlist: cartList,
     });
   } catch (error) {
@@ -135,6 +147,14 @@ const addProductInWishlistByCustomerId = async (req, res) => {
       return res.status(400).json({ message: "product not found" });
     }
     // Add the product to the customer's wishlist
+    const existingInWishlist = customer.wishList.find(
+      (item) => item.toString() === ProductId
+    );
+    if (existingInWishlist) {
+      return res
+        .status(400)
+        .json({ message: "product already added to the wishlist" });
+    }
     customer.wishList.push(product._id);
 
     // Save the updated customer

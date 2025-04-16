@@ -21,6 +21,11 @@ const productSchema = new mongoose.Schema({
     type: String, // e.g., "1 piece", "Pack of 2", "Set of 5"
     required: true,
   },
+  isAvailabel: {
+    type: Boolean,
+    required: true,
+    default: true,
+  },
   category: {
     type: [
       {
