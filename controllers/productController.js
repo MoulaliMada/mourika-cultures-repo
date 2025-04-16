@@ -1,7 +1,8 @@
+const fs = require("fs");
+const path = require("path");
 const Product = require("../models/Product");
 const Vendor = require("../models/Vendor");
 const multer = require("multer");
-const path = require("path");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cd) {
@@ -44,4 +45,71 @@ const addProduct = async (req, res) => {
   }
 };
 
-module.exports = { addProduct: [upload.single("image"), addProduct] };
+const updateProduct = async (req, res) => {
+  const productId = req.params.productid;
+
+  try {
+    const updateData = req.body;
+    const image = req.file ? req.file.filename : undefined;
+
+    // Find the product first
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    console.log("prodct finding");
+    // If a new image is uploaded and an old image exists, delete old image
+    if (image && product.image) {
+      const oldImagePath = path.join(__dirname, "..", "uploads", product.image);
+      fs.unlink(oldImagePath, (err) => {
+        if (err) {
+          console.error("Failed to delete old image:", err);
+        } else {
+          console.log("Old image deleted:", product.image);
+        }
+      });
+    }
+
+    // Update fields only if provided
+    Object.keys(updateData).forEach((key) => {
+      product[key] = updateData[key];
+    });
+
+    // Update image if uploaded
+    if (image) {
+      product.image = image;
+    }
+    const updatedProduct = await product.save();
+
+    res.status(200).json({
+      message: "Product updated successfully",
+      product: updatedProduct,
+    });
+  } catch (error) {
+    console.error("Product Update Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const getProductById = async (req, res) => {
+  const productId = req.params.productid;
+  try {
+    const product =await Product.findById(productId);
+    if (!product) {
+      res.status(400).json({ message: "product not found" });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "product found successfully", product });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = {
+  addProduct: [upload.single("image"), addProduct],
+  updateProduct,
+  getProductById
+};

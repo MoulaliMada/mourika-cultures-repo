@@ -15,4 +15,7 @@ router.get("uploads/:imageName", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "uploads", imageName));
 });
 
+router.put("/update-product/:productid", productController.updateProduct);
+router.get("/get-product/:productid", productController.getProductById);
+
 module.exports = router;
