@@ -94,7 +94,7 @@ const updateProduct = async (req, res) => {
 const getProductById = async (req, res) => {
   const productId = req.params.productid;
   try {
-    const product =await Product.findById(productId);
+    const product = await Product.findById(productId);
     if (!product) {
       res.status(400).json({ message: "product not found" });
     }
@@ -108,8 +108,65 @@ const getProductById = async (req, res) => {
   }
 };
 
+const getAllProducts = async (req, res) => {
+  try {
+    const products = await Product.find(); // Fetch all products from DB
+
+    if (!products || products.length === 0) {
+      return res.status(404).json({ message: "No products found" });
+    }
+
+    res.status(200).json({
+      message: "Products fetched successfully",
+      products,
+    });
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const deleteProductById = async (req, res) => {
+  const productId = req.params.productid;
+
+  try {
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    const vendorId = product.vendor;
+    // Delete associated image file if exists
+    if (product.image) {
+      const imagePath = path.join(__dirname, "..", "uploads", product.image);
+      fs.unlink(imagePath, (err) => {
+        if (err) {
+          console.error("Error deleting image file:", err);
+        } else {
+          console.log("Image file deleted:", product.image);
+        }
+      });
+    }
+
+    // Delete product from DB
+    await Product.findByIdAndDelete(productId);
+
+    const vendor = await Vendor.findById(vendorId);
+    vendor.products = vendor.products.filter(
+      (item) => item.toString() !== productId
+    );
+    await vendor.save();
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    console.error("Delete Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   addProduct: [upload.single("image"), addProduct],
   updateProduct,
-  getProductById
+  getProductById,
+  getAllProducts,
+  deleteProductById,
 };

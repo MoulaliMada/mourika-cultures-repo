@@ -14,6 +14,13 @@ const vendorRegister = async (req, res) => {
     if (existingVendorByPhoneNumber) {
       return res.status(400).json({ message: "vendor already registered" });
     }
+    const vendors = await Vendor.find();
+    if (vendors.length === 1) {
+      return res.status(400).json({
+        message:
+          "A vendor is already registered. This application allows only one vendor account.",
+      });
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newVendor = new Vendor({
       vendorName,
@@ -40,13 +47,11 @@ const vendorLogin = async (req, res) => {
       return res.status(400).json({ message: "vendor not found" });
     } else if (!(await bcrypt.compare(password, existingVendor.password))) {
       // checking existing password and user enter password correct or not
-      return res
-        .status(401)
-        .json({
-          message: "Invalid credentials",
-          password1: password,
-          password2: existingVendor.password,
-        });
+      return res.status(401).json({
+        message: "Invalid credentials",
+        password1: password,
+        password2: existingVendor.password,
+      });
     }
     const token = jwt.sign(
       {
