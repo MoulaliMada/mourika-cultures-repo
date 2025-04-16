@@ -1,7 +1,7 @@
 const customerRouter = require("./routes/customerRoute");
 const vendorRouter = require("./routes/vendorRoute");
 const productRouter = require("./routes/productRoute");
-const adressRouter = require("./routes/adressRoute");
+const addressRouter = require("./routes/addressRoute");
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
@@ -20,7 +20,7 @@ mongoose
 app.use("/customer", customerRouter);
 app.use("/vendor", vendorRouter);
 app.use("/product", productRouter);
-app.use("/adress", adressRouter);
+app.use("/address", addressRouter);
 
 app.get("/", (req, res) => {
   res.send("namaste");

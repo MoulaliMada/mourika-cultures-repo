@@ -28,8 +28,8 @@ const customerSchema = new mongoose.Schema({
       },
     ],
   },
-  adressList: {
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Adress" }],
+  addressList: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Address" }],
   },
   cartList: {
     type: [
