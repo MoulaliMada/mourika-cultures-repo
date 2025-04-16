@@ -110,8 +110,34 @@ const deleteAddressById = async (req, res) => {
   }
 };
 
-
+const getAllAdressesByCustomerId = async (req, res) => {
+  const customerId = req.params.customerid;
+  try {
+    const customer = await Customer.findById(customerId).populate(
+      "addressList"
+    );
+    if (!customer) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
+    const customerAddressList = customer.addressList;
+    if (!customerAddressList || customerAddressList.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Customer doesn't have any addresses" });
+    }
+    return res.status(200).json({
+      message: "Addresses fetched successfully",
+      addressList: customerAddressList,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
 module.exports = {
-  addAddressByCostomerId,updateAddressById,deleteAddressById
+  addAddressByCostomerId,
+  updateAddressById,
+  deleteAddressById,
+  getAllAdressesByCustomerId,
 };

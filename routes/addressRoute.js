@@ -11,4 +11,9 @@ router.delete(
   "/delete-address/:addressid",
   addressController.deleteAddressById
 );
+router.get(
+  "/get-address/:customerid",
+  addressController.getAllAdressesByCustomerId
+);
+
 module.exports = router;
