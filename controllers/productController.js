@@ -126,6 +126,28 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+const getAllProductsByCategory = async (req, res) => {
+  const category = req.params.category;
+  try {
+    //const allProducts = await Product.find();
+    // const filterdProducts = allProducts.filter((eachProduct) => {
+    //   return eachProduct.category[0] === category;
+    // });
+
+    const filteredProducts = await Product.find({ category: category });
+    if (filteredProducts.length === 0) {
+      res.status(400).json({ message: "there is no more products" });
+    }
+    res.status(200).json({
+      message: "get products successfully",
+      products: filteredProducts,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 const deleteProductById = async (req, res) => {
   const productId = req.params.productid;
 
@@ -169,4 +191,5 @@ module.exports = {
   getProductById,
   getAllProducts,
   deleteProductById,
+  getAllProductsByCategory,
 };

@@ -49,8 +49,8 @@ const customerLogin = async (req, res) => {
         customerId: existingCustomer._id,
         phoneNumber: existingCustomer.phoneNumber,
       },
-      secreteKey,
-      { expiresIn: "1d" }
+      secreteKey
+      //{ expiresIn: "1d" }
     );
     return res.status(200).json({
       message: "login successfully",

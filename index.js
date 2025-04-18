@@ -2,6 +2,7 @@ const customerRouter = require("./routes/customerRoute");
 const vendorRouter = require("./routes/vendorRoute");
 const productRouter = require("./routes/productRoute");
 const addressRouter = require("./routes/addressRoute");
+const passwordResetRouter = require("./routes/passwordResetRoute");
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
@@ -21,6 +22,7 @@ app.use("/customer", customerRouter);
 app.use("/vendor", vendorRouter);
 app.use("/product", productRouter);
 app.use("/address", addressRouter);
+app.use("/auth", passwordResetRouter);
 
 app.get("/", (req, res) => {
   res.send("namaste");

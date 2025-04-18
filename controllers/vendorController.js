@@ -58,8 +58,8 @@ const vendorLogin = async (req, res) => {
         vendorId: existingVendor._id,
         phoneNumber: existingVendor.phoneNumber,
       },
-      secreteKey,
-      { expiresIn: "1d" }
+      secreteKey
+      //{ expiresIn: "1d" }
     );
 
     return res

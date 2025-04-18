@@ -18,6 +18,11 @@ router.get("uploads/:imageName", (req, res) => {
 router.put("/update-product/:productid", productController.updateProduct);
 router.get("/get-product/:productid", productController.getProductById);
 router.get("/get-all-products", productController.getAllProducts);
+router.get(
+  "/get-all-products/:category",
+  productController.getAllProductsByCategory
+);
+
 router.delete(
   "/delete-product/:productid",
   productController.deleteProductById
