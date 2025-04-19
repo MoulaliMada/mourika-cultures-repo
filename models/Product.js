@@ -26,6 +26,10 @@ const productSchema = new mongoose.Schema({
     required: true,
     default: true,
   },
+  deliveryCharges: {
+    type: String,
+    required: true,
+  },
   category: {
     type: [
       {

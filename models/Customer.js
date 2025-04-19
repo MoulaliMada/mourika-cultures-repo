@@ -47,6 +47,9 @@ const customerSchema = new mongoose.Schema({
     ],
     default: [],
   },
+  orders: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Order" }],
+  },
 });
 
 const Customer = mongoose.model("Customer", customerSchema);
