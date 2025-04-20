@@ -31,7 +31,9 @@ const sendOtpToCustomerPhone = async (req, res) => {
     return res.status(500).json({ message: "Failed to send OTP" });
   }
 
-  res.status(200).json({ message: "OTP sent to your registered phone number" });
+  return res
+    .status(200)
+    .json({ message: "OTP sent to your registered phone number" });
 };
 
 const sendOtpToVendorPhone = async (req, res) => {
@@ -55,23 +57,61 @@ const sendOtpToVendorPhone = async (req, res) => {
     return res.status(500).json({ message: "Failed to send OTP" });
   }
 
-  res.status(200).json({ message: "OTP sent to your registered phone number" });
+  return res
+    .status(200)
+    .json({ message: "OTP sent to your registered phone number" });
 };
 
-// veryfiging the customer enterd phone number by otp verification
+// veryfiging the customer,vendor enterd phone number by otp verification on registration time
 const sendOtpForVerifyPhoneNumber = async (req, res) => {
   const { phoneNumber } = req.body;
+
   try {
-    const generatedOtp = generateOTP();
-    const sent = await sendOTP(phoneNumber, generatedOtp);
+    // Check if customer with phone number already exists
+    const existedCustomer = await Customer.findOne({ phoneNumber });
+    if (existedCustomer) {
+      return res
+        .status(400)
+        .json({ message: "Customer already registered with this number" });
+    }
+
+    // Check if vendor with phone number already exists
+    const existedVendor = await Vendor.findOne({ phoneNumber });
+    if (existedVendor) {
+      return res
+        .status(400)
+        .json({ message: "Vendor already registered with this number" });
+    }
+
+    // Allow only one vendor in the application
+    const allVendors = await Vendor.find();
+    if (allVendors.length >= 1) {
+      return res.status(400).json({
+        message:
+          "Vendor already exists. Only one vendor is allowed in this application.",
+      });
+    }
+
+    // Generate OTP and send
+    const generatedOtp = generateOTP(); // should return a 6-digit string
+    const sent = await sendOTP(phoneNumber, generatedOtp); // Twilio send function
+
+    if (!sent) {
+      return res.status(500).json({ message: "Failed to send OTP" });
+    }
+
+    // Save OTP in DB
     const saveOtpModel = new Otp({
       phoneNumber,
       otp: generatedOtp,
     });
+
     await saveOtpModel.save();
+
+    return res.status(200).json({ message: "OTP sent successfully" });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "internal server erroe" });
+    console.error("Error sending OTP:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -82,7 +122,7 @@ const verifyOtp = async (req, res) => {
     const record = await Otp.findOne({ phoneNumber });
     if (!record) return res.status(400).json({ message: "expired OTP" });
     if (record.otp !== otp) {
-      return res.status(400).json({ message: "Invalid or OTP" });
+      return res.status(400).json({ message: "Invalid OTP" });
     }
 
     // Delete the OTP record after successful verification
@@ -107,7 +147,7 @@ const resetPasswordCustomer = async (req, res) => {
   customer.password = hashedPassword;
   await customer.save();
 
-  res.status(200).json({ message: "Password reset successfully" });
+  return res.status(200).json({ message: "Password reset successfully" });
 };
 
 const resetPasswordVendor = async (req, res) => {
@@ -121,13 +161,14 @@ const resetPasswordVendor = async (req, res) => {
   vendor.password = hashedPassword;
   await vendor.save();
 
-  res.status(200).json({ message: "Password reset successfully" });
+  return res.status(200).json({ message: "Password reset successfully" });
 };
 
 module.exports = {
   sendOtpToCustomerPhone,
   sendOtpForVerifyPhoneNumber,
   verifyOtp,
-  resetPasswordCustomer,resetPasswordVendor,
+  resetPasswordCustomer,
+  resetPasswordVendor,
   sendOtpToVendorPhone,
 };
