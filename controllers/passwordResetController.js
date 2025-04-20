@@ -41,7 +41,9 @@ const sendOtpToVendorPhone = async (req, res) => {
 
   const vendor = await Vendor.findOne({ phoneNumber });
   if (!vendor) {
-    return res.status(404).json({ message: "vendor not found" });
+    return res
+      .status(404)
+      .json({ message: "vendor not found or not registerd" });
   }
 
   const generatedOtp = generateOTP();
@@ -62,8 +64,8 @@ const sendOtpToVendorPhone = async (req, res) => {
     .json({ message: "OTP sent to your registered phone number" });
 };
 
-// veryfiging the customer,vendor enterd phone number by otp verification on registration time
-const sendOtpForVerifyPhoneNumber = async (req, res) => {
+// veryfiging the customer enterd phone number by otp verification on registration time
+const sendOtpForVerifyCustomerPhoneNumber = async (req, res) => {
   const { phoneNumber } = req.body;
 
   try {
@@ -75,6 +77,34 @@ const sendOtpForVerifyPhoneNumber = async (req, res) => {
         .json({ message: "Customer already registered with this number" });
     }
 
+    // Generate OTP and send
+    const generatedOtp = generateOTP(); // should return a 6-digit string
+    const sent = await sendOTP(phoneNumber, generatedOtp); // Twilio send function
+
+    if (!sent) {
+      return res.status(500).json({ message: "Failed to send OTP" });
+    }
+
+    // Save OTP in DB
+    const saveOtpModel = new Otp({
+      phoneNumber,
+      otp: generatedOtp,
+    });
+
+    await saveOtpModel.save();
+
+    return res.status(200).json({ message: "OTP sent successfully" });
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// veryfiging the vendor enterd phone number by otp verification on registration time
+const sendOtpForVerifyVendorPhoneNumber = async (req, res) => {
+  const { phoneNumber } = req.body;
+
+  try {
     // Check if vendor with phone number already exists
     const existedVendor = await Vendor.findOne({ phoneNumber });
     if (existedVendor) {
@@ -166,7 +196,8 @@ const resetPasswordVendor = async (req, res) => {
 
 module.exports = {
   sendOtpToCustomerPhone,
-  sendOtpForVerifyPhoneNumber,
+  sendOtpForVerifyCustomerPhoneNumber,
+  sendOtpForVerifyVendorPhoneNumber,
   verifyOtp,
   resetPasswordCustomer,
   resetPasswordVendor,
