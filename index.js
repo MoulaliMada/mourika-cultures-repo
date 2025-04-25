@@ -7,9 +7,16 @@ const orderRouter = require("./routes/orderRoute");
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const cors = require("cors");
 
 const app = express();
+
 dotenv.config();
+app.use(cors());
+// app.use(cors({
+//   origin: 'https://morikacultures.vercel.app',
+//   credentials: true // if you're using cookies/auth headers
+// }));
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
